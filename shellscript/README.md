@@ -45,3 +45,34 @@ Verification successful
    "afspraakId":2587197219}
 ]
 ```
+
+
+### MacOS Notes
+
+(tested on macOS Big Sur)
+
+The standard MacOS openssl client is based on LibreSSL and does not contain the 
+`openssl cms` option to be able to run the shell scripts.
+
+There are 2 options :
+
+1) Run the scripts from Docker. Make sure the image has openssl and jq. Most don't have that, so you probably have to make one yourself
+   Dockerfile like this would do :
+```
+  FROM debian:stable
+  RUN apt-get update && apt-get install -y openssl jq
+  CMD bash
+```
+and from the shellscript directory :
+```
+   docker run --rm  -v $(pwd):/shellscript <image name or id> bash -c 'cd /shellscript; ./sign.sh | ./verify.sh ca.pem'
+```
+2) Install openssl through brew (version 1.1.1i was tested and works)
+```
+brew install openssl
+# brew install gives feedback on how to use the installed openssl
+export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
+./sign.sh | ./verify.sh ca.pem
+```
+
+
